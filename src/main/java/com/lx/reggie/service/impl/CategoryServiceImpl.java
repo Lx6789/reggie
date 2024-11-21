@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> implements CategoryService {
@@ -58,6 +60,15 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     public R<String> UpdateCategory(Category category) {
         categoryService.updateById(category);
         return R.success("修改分类信息成功");
+    }
+
+    @Override
+    public R<List<Category>> QueryClassification(Category category) {
+        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(category.getType() != null, Category::getType, category.getType());
+        queryWrapper.orderByAsc(Category::getSort).orderByDesc(Category::getUpdateTime);
+        List<Category> list = categoryService.list(queryWrapper);
+        return R.success(list);
     }
 
     /**

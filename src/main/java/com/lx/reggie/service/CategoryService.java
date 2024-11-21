@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.lx.reggie.common.R;
 import com.lx.reggie.entity.Category;
 
+import java.util.List;
+
 public interface CategoryService extends IService<Category> {
     R<String> AddCategory(Category category);
 
@@ -13,4 +15,6 @@ public interface CategoryService extends IService<Category> {
     R<String> DeleteCategory(Long id);
 
     R<String> UpdateCategory(Category category);
+
+    R<List<Category>> QueryClassification(Category category);
 }

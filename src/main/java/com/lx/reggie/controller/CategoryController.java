@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 分类管理
  */
@@ -58,5 +60,15 @@ public class CategoryController {
     @PutMapping
     public R<String> update(@RequestBody Category category) {
         return categoryService.UpdateCategory(category);
+    }
+
+    /**
+     * 根据条件查询分类数据
+     * @param category
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Category>> list(Category category) {
+        return categoryService.QueryClassification(category);
     }
 }
