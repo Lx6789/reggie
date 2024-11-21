@@ -10,4 +10,8 @@ public interface DishService extends IService<Dish> {
     R<Page> DishPagingQuery(int page, int pageSize, String name);
 
     R<String> AddDishes(DishDto dishDto);
+
+    R<DishDto> SelectDishWithFlavor(Long id);
+
+    R<String> updateDishes(DishDto dishDto);
 }

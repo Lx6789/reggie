@@ -21,7 +21,7 @@ public class DishController {
     private DishFlavorService dishFlavorService;
 
     /**
-     *
+     * 新增菜品
      * @param dishDto
      * @return
      */
@@ -40,5 +40,25 @@ public class DishController {
     @GetMapping("/page")
     public R<Page> page(int page, int pageSize, String name) {
         return dishService.DishPagingQuery(page, pageSize, name);
+    }
+
+    /**
+     * 根据id查询菜品信息和口味信息
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<DishDto> get(@PathVariable Long id) {
+        return dishService.SelectDishWithFlavor(id);
+    }
+
+
+    /**
+     * 修改菜品
+     * @param dishDto
+     * @return
+     */
+    @PutMapping
+    public R<String> update(@RequestBody DishDto dishDto) {
+        return dishService.updateDishes(dishDto);
     }
 }

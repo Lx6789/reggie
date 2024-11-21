@@ -49,8 +49,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
             Long categoryId = item.getCategoryId();//分类id
             //根据id查询分类对象
             Category category = categoryService.getById(categoryId);
-            String categoryName = category.getName();
-            dishDto.setCategoryName(categoryName);
+            if (category != null) {
+                String categoryName = category.getName();
+                dishDto.setCategoryName(categoryName);
+            }
             return dishDto;
         }).collect(Collectors.toList());
         dishDtoPage.setRecords(list);
@@ -61,6 +63,16 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     public R<String> AddDishes(DishDto dishDto) {
         SaveWithFlavor(dishDto);
         return R.success("新增菜品成功");
+    }
+
+    @Override
+    public R<DishDto> SelectDishWithFlavor(Long id) {
+        return R.success(getByIdWithFlavor(id));
+    }
+
+    @Override
+    public R<String> updateDishes(DishDto dishDto) {
+        return R.success("修改成功");
     }
 
     /**
@@ -79,6 +91,40 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
            return item;
         }).collect(Collectors.toList());
         //保存菜品口味数据到dish_flavor
+        dishFlavorService.saveBatch(flavors);
+    }
+
+    /**
+     * 根据id查询菜品信息及口味信息
+     * @param id
+     * @return
+     */
+    private DishDto getByIdWithFlavor(Long id) {
+        //查询菜品基本信息
+        Dish dish = this.getById(id);
+        DishDto dishDto = new DishDto();
+        BeanUtils.copyProperties(dish, dishDto);
+        //查询菜品口味信息
+        LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(DishFlavor::getDishId, dish.getId());
+        List<DishFlavor> flavors = dishFlavorService.list(queryWrapper);
+        dishDto.setFlavors(flavors);
+        return dishDto;
+    }
+
+    private void UpdateWithFlavor(DishDto dishDto) {
+        //更新dish表
+        this.updateById(dishDto);
+        //清理当前菜品对应的口味数据
+        LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(DishFlavor::getDishId, dishDto.getId());
+        dishFlavorService.remove(queryWrapper);
+        //添加提交来的口味数据
+        List<DishFlavor> flavors = dishDto.getFlavors();
+        flavors = flavors.stream().map((item) -> {
+            item.setDishId(dishDto.getId());
+            return item;
+        }).collect(Collectors.toList());
         dishFlavorService.saveBatch(flavors);
     }
 }
