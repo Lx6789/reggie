@@ -3,11 +3,14 @@ package com.lx.reggie.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lx.reggie.common.R;
 import com.lx.reggie.dto.DishDto;
+import com.lx.reggie.entity.Dish;
 import com.lx.reggie.service.DishFlavorService;
 import com.lx.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/dish")
@@ -60,5 +63,15 @@ public class DishController {
     @PutMapping
     public R<String> update(@RequestBody DishDto dishDto) {
         return dishService.updateDishes(dishDto);
+    }
+
+    /**
+     * 根据条件查询菜品数据
+     * @param dish
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Dish>> list(Dish dish) {
+        return dishService.SelectDish(dish);
     }
 }

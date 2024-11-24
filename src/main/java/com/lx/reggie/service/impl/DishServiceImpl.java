@@ -72,7 +72,17 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     @Override
     public R<String> updateDishes(DishDto dishDto) {
+        UpdateWithFlavor(dishDto);
         return R.success("修改成功");
+    }
+
+    @Override
+    public R<List<Dish>> SelectDish(Dish dish) {
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+        List<Dish> list = dishService.list();
+        return R.success(list);
     }
 
     /**
