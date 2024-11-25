@@ -1,11 +1,16 @@
 package com.lx.reggie.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lx.reggie.common.R;
+import com.lx.reggie.dto.SetmealDto;
 import com.lx.reggie.service.SetmealDishService;
+import com.lx.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 套餐管理
@@ -16,9 +21,40 @@ import org.springframework.web.bind.annotation.RestController;
 public class SetmealController {
 
     @Autowired
-    private SetmealController setmealController;
+    private SetmealService setmealService;
 
     @Autowired
     private SetmealDishService setmealDishService;
 
+    /**
+     * 新增套餐
+     * @param setmealDto
+     * @return
+     */
+    @PostMapping
+    public R<String> save(@RequestBody SetmealDto setmealDto) {
+        return setmealService.saveSetmeal(setmealDto);
+    }
+
+    /**
+     * 套餐分页查询
+     * @param page
+     * @param pageSize
+     * @param name
+     * @return
+     */
+    @GetMapping("/page")
+    public R<Page> page(int page, int pageSize, String name) {
+        return setmealService.PagingQuery(page, pageSize, name);
+    }
+
+    /**
+     * 删除套餐
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids) {
+        return setmealService.DeleteSetmeal(ids);
+    }
 }
