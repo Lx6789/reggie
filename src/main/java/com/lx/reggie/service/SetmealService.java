@@ -9,6 +9,8 @@ import com.lx.reggie.entity.Setmeal;
 import java.util.List;
 
 public interface SetmealService extends IService<Setmeal> {
+    R<List<Setmeal>> QuerySetmeal(Setmeal setmeal);
+
     R<String> DeleteSetmeal(List<Long> ids);
 
     R<String> saveSetmeal(SetmealDto setmealDto);

@@ -3,6 +3,7 @@ package com.lx.reggie.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lx.reggie.common.R;
 import com.lx.reggie.dto.SetmealDto;
+import com.lx.reggie.entity.Setmeal;
 import com.lx.reggie.service.SetmealDishService;
 import com.lx.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
@@ -56,5 +57,15 @@ public class SetmealController {
     @DeleteMapping
     public R<String> delete(@RequestParam List<Long> ids) {
         return setmealService.DeleteSetmeal(ids);
+    }
+
+    /**
+     * 根据条件查询菜单数据
+     * @param setmeal
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Setmeal>> list(Setmeal setmeal) {
+        return setmealService.QuerySetmeal(setmeal);
     }
 }
