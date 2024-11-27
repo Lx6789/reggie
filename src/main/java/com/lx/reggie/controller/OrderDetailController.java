@@ -8,4 +8,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/orderDetail")
 @Slf4j
 public class OrderDetailController {
+
 }

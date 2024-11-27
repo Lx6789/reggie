@@ -1,6 +1,8 @@
 package com.lx.reggie.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lx.reggie.common.CustomException;
 import com.lx.reggie.common.R;
 import com.lx.reggie.dto.DishDto;
 import com.lx.reggie.entity.Dish;
@@ -94,5 +96,48 @@ public class DishController {
     @GetMapping("/list")
     public R<List<DishDto>> list(Dish dish) {
         return dishService.SelectDish(dish);
+    }
+
+    /**
+     * 删除
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    public R<String> delet(@RequestParam List<Long> ids) {
+        log.info("dish :" + ids.toString());
+        dishService.Remove(ids);
+        return R.success("删除成功");
+    }
+
+    /**
+     * 修改状态，修改dish表
+     * @param status
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    public R<String> getDishStatus(@PathVariable int status, @RequestParam List<Long> ids) {
+        //判断status 0 停售 1 起售
+        if (status == 0) {
+            for (int i = 0; i < ids.size(); i++) {
+                //判断是否需要修改状态
+                Dish dish = dishService.getById(ids.get(i));
+                if (dish.getStatus() == 1) {
+                    dish.setStatus(0);
+                    dishService.updateById(dish);
+                }
+            }
+        } else {
+            for (int i = 0; i < ids.size(); i++) {
+                //判断是否需要修改状态
+                Dish dish = dishService.getById(ids.get(i));
+                if (dish.getStatus() == 0) {
+                    dish.setStatus(1);
+                    dishService.updateById(dish);
+                }
+            }
+        }
+        return R.success("修改成功");
     }
 }

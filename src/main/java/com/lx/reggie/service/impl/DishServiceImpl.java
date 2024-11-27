@@ -3,23 +3,26 @@ package com.lx.reggie.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lx.reggie.common.CustomException;
 import com.lx.reggie.common.R;
 import com.lx.reggie.dto.DishDto;
-import com.lx.reggie.entity.Category;
-import com.lx.reggie.entity.Dish;
-import com.lx.reggie.entity.DishFlavor;
+import com.lx.reggie.entity.*;
 import com.lx.reggie.mapper.DishMapper;
 import com.lx.reggie.service.CategoryService;
 import com.lx.reggie.service.DishFlavorService;
 import com.lx.reggie.service.DishService;
+import com.lx.reggie.service.SetmealDishService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements DishService {
 
@@ -31,6 +34,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private SetmealDishService setmealDishService;
 
     @Override
     public R<Page> DishPagingQuery(int page, int pageSize, String name) {
@@ -114,6 +120,33 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         }).collect(Collectors.toList());
 
         return R.success(dishDtoList);
+    }
+
+    //对菜品表与菜品口味表操作
+    @Transactional
+    @Override
+    public void Remove(List<Long> ids) {
+        //判断是否停售
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(Dish::getId, ids);
+        List<Dish> list = this.list(queryWrapper);
+        for (int i = 0; i < list.size(); i++) {
+            //判断当前菜品手否关联套餐
+            LambdaQueryWrapper<SetmealDish> wrapper1 = new LambdaQueryWrapper<>();
+            wrapper1.eq(SetmealDish::getDishId, ids);
+            int count = setmealDishService.count(wrapper1);
+            if (count > 0) {
+                break;
+            }
+            if (list.get(i).getStatus() == 0) {
+                //若为停售则删除菜品及其对应的口味
+                Long dishId = list.get(i).getId();
+                this.removeById(dishId);
+                LambdaQueryWrapper<DishFlavor> wrapper = new LambdaQueryWrapper<>();
+                wrapper.eq(DishFlavor::getDishId, dishId);
+                dishFlavorService.remove(wrapper);
+            }
+        }
     }
 
     /**

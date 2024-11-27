@@ -19,4 +19,5 @@ public interface DishService extends IService<Dish> {
 
     R<List<DishDto>> SelectDish(Dish dish);
 
+    void Remove(List<Long> ids);
 }
