@@ -40,12 +40,18 @@ public class OrderController {
         Page<Orders> pageInfo = new Page(page, pageSize);
         //构造条件构造器
         LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(number != null, Orders::getNumber, number);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM -dd HH:mm:ss");
-        // 进行转换
-        LocalDateTime bt = LocalDateTime.parse(beginTime, formatter);
-        LocalDateTime et = LocalDateTime.parse(endTime, formatter);
-
-        return null;
+        //判断时间
+        LocalDateTime bt = null;
+        LocalDateTime et = null;
+        if (beginTime != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            // 进行转换
+            bt = LocalDateTime.parse(beginTime, formatter);
+            et = LocalDateTime.parse(endTime, formatter);
+        }
+        queryWrapper.eq(number != null, Orders::getNumber, number).between(bt != null ,Orders::getOrderTime, bt, et);
+        queryWrapper.orderByDesc(Orders::getOrderTime);
+        orderService.page(pageInfo, queryWrapper);
+        return R.success(pageInfo);
     }
 }
